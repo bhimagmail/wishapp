@@ -102,12 +102,10 @@ st.markdown(
 # HELPERS
 # =========================================================
 
-
 def encode_data(data):
     json_data = json.dumps(data)
     encoded = base64.urlsafe_b64encode(json_data.encode()).decode()
     return encoded
-
 
 
 def decode_data(encoded):
@@ -137,7 +135,6 @@ if wish_data:
         message = data.get("message")
         emoji = data.get("emoji")
 
-        # Animations
         st.balloons()
 
         st.markdown(
@@ -145,11 +142,14 @@ if wish_data:
             <div class='title'>✨ Special Wish ✨</div>
 
             <div class='wish-card'>
+
                 <div class='wish-type'>
                     {emoji} {occasion} {emoji}
                 </div>
 
-                <h2>Dear {receiver},</h2>
+                <div style="font-size:2rem; font-weight:700; margin-top:20px;">
+                    Dear {receiver},
+                </div>
 
                 <div class='wish-message'>
                     {message}
@@ -158,6 +158,7 @@ if wish_data:
                 <div class='wish-from'>
                     ❤️ From {sender}
                 </div>
+
             </div>
             """,
             unsafe_allow_html=True
@@ -190,100 +191,69 @@ else:
 
     st.markdown("### Create a Beautiful Wish Link")
 
-    with st.container():
+    occasion = st.selectbox(
+        "Select Occasion",
+        [
+            "Birthday",
+            "Anniversary",
+            "Graduation",
+            "Congratulations",
+            "New Year",
+            "Custom"
+        ]
+    )
 
-        st.markdown("<div class='creator-box'>", unsafe_allow_html=True)
+    emoji_map = {
+        "Birthday": "🎂",
+        "Anniversary": "💖",
+        "Graduation": "🎓",
+        "Congratulations": "🎉",
+        "New Year": "🎆",
+        "Custom": "✨"
+    }
 
-        occasion = st.selectbox(
-            "Select Occasion",
-            [
-                "Birthday",
-                "Anniversary",
-                "Graduation",
-                "Congratulations",
-                "New Year",
-                "Custom"
-            ]
-        )
+    sender = st.text_input("Your Name")
+    receiver = st.text_input("Receiver Name")
 
-        emoji_map = {
-            "Birthday": "🎂",
-            "Anniversary": "💖",
-            "Graduation": "🎓",
-            "Congratulations": "🎉",
-            "New Year": "🎆",
-            "Custom": "✨"
-        }
+    default_messages = {
+        "Birthday": "Wishing you happiness, success, laughter, and endless joy on your special day!",
+        "Anniversary": "May your love continue to grow stronger with each passing year.",
+        "Graduation": "Congratulations on your achievement and best wishes for your future journey.",
+        "Congratulations": "You did it! Wishing you even more success ahead.",
+        "New Year": "May the new year bring happiness, peace, and success into your life.",
+        "Custom": "Write your own message here..."
+    }
 
-        sender = st.text_input("Your Name")
-        receiver = st.text_input("Receiver Name")
+    message = st.text_area(
+        "Wish Message",
+        value=default_messages[occasion],
+        height=180
+    )
 
-        default_messages = {
-            "Birthday": "Wishing you happiness, success, laughter, and endless joy on your special day!",
-            "Anniversary": "May your love continue to grow stronger with each passing year.",
-            "Graduation": "Congratulations on your achievement and best wishes for your future journey.",
-            "Congratulations": "You did it! Wishing you even more success ahead.",
-            "New Year": "May the new year bring happiness, peace, and success into your life.",
-            "Custom": "Write your own message here..."
-        }
+    if st.button("Generate Wish Link", use_container_width=True):
 
-        message = st.text_area(
-            "Wish Message",
-            value=default_messages[occasion],
-            height=180
-        )
+        if not sender or not receiver or not message:
+            st.warning("Please fill all fields.")
 
-        if st.button("Generate Wish Link", use_container_width=True):
+        else:
 
-            if not sender or not receiver or not message:
-                st.warning("Please fill all fields.")
+            payload = {
+                "occasion": occasion,
+                "sender": sender,
+                "receiver": receiver,
+                "message": message,
+                "emoji": emoji_map[occasion]
+            }
 
-            else:
+            encoded = encode_data(payload)
 
-                payload = {
-                    "occasion": occasion,
-                    "sender": sender,
-                    "receiver": receiver,
-                    "message": message,
-                    "emoji": emoji_map[occasion]
-                }
+            app_url = st.secrets.get(
+                "APP_URL",
+                "http://wish-app.streamlit.app"
+            )
 
-                encoded = encode_data(payload)
+            share_link = f"{app_url}/?wish={quote(encoded)}"
 
-                app_url = st.secrets.get(
-                    "APP_URL",
-                    "https://wish-app.streamlit.app"
-                )
+            st.success("Wish link generated successfully!")
 
-                share_link = f"{app_url}/?wish={quote(encoded)}"
-
-                st.success("Wish link generated successfully!")
-
-                st.code(share_link, language="text")
-
-                st.markdown("### Preview")
-
-                st.markdown(
-    f"""
-    <div class='wish-card'>
-        <div class='wish-type'>
-            {emoji} {occasion} {emoji}
-        </div>
-
-        <div style="font-size:2rem; font-weight:700; margin-top:20px;">
-            Dear {receiver},
-        </div>
-
-        <div class='wish-message'>
-            {message}
-        </div>
-
-        <div class='wish-from'>
-            ❤️ From {sender}
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
-        st.markdown("</div>", unsafe_allow_html=True)
+            st.code(share_link, language="text")
