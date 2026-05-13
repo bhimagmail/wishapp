@@ -252,7 +252,7 @@ else:
 
                 app_url = st.secrets.get(
                     "APP_URL",
-                    "https://wishapp.streamlit.app"
+                    "https://wish-app.streamlit.app"
                 )
 
                 share_link = f"{app_url}/?wish={quote(encoded)}"
