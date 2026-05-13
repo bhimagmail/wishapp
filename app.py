@@ -264,24 +264,26 @@ else:
                 st.markdown("### Preview")
 
                 st.markdown(
-                    f"""
-                    <div class='wish-card'>
-                        <div class='wish-type'>
-                            {emoji_map[occasion]} {occasion}
-                        </div>
+    f"""
+    <div class='wish-card'>
+        <div class='wish-type'>
+            {emoji} {occasion} {emoji}
+        </div>
 
-                        <h2>Dear {receiver},</h2>
+        <div style="font-size:2rem; font-weight:700; margin-top:20px;">
+            Dear {receiver},
+        </div>
 
-                        <div class='wish-message'>
-                            {message}
-                        </div>
+        <div class='wish-message'>
+            {message}
+        </div>
 
-                        <div class='wish-from'>
-                            ❤️ From {sender}
-                        </div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True
-                )
+        <div class='wish-from'>
+            ❤️ From {sender}
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
         st.markdown("</div>", unsafe_allow_html=True)
